@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Scan Catalogue - AR</title>
+
+    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <link rel="stylesheet" href="../style/style.css">
+    
+    <!-- MUST be loaded in the head so the gesture component registers before the scene -->
+    <script src="./marker-ui.js"></script>
+  </head>
+
+  <body>
+    <!-- The UI Overlay -->
+    <div class="ar-ui-layer">
+        <!-- Top Carousel (Categories) -->
+        <div class="category-carousel">
+            <button class="category-btn active" data-category="chair">Chair</button>
+            <button class="category-btn" data-category="sofa">Sofa</button>
+            <button class="category-btn" data-category="cupboard">Cupboard</button>
+            <button class="category-btn" data-category="table">Table</button>
+        </div>
+
+        <!-- Left/Right Model Navigators -->
+        <button id="prev-btn" class="nav-btn left">&lt;</button>
+        <button id="next-btn" class="nav-btn right">&gt;</button>
+
+        <!-- Back Button -->
+        <a href="../index.html" class="back-btn">Back</a>
+    </div>
+
+    <!-- The AR Scene -->
+    <a-scene
+      mindar-image="imageTargetSrc: ../assets/markers/targets.mind;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        <!-- Added gesture-handler and updated the folder path -->
+        <a-gltf-model
+          id="furniture-model"
+          src="../assets/models/chair/chair_1.glb"
+          position="0 0 0.1"
+          scale="0.6 0.6 0.6"
+          rotation="0 0 0"
+          gesture-handler
+        ></a-gltf-model>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
