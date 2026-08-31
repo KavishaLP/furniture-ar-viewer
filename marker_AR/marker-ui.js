@@ -93,16 +93,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCategory = 'chair';
     let currentIndex = 0;
 
-    const modelEntity = document.getElementById('furniture-model');
     const categoryButtons = document.querySelectorAll('.category-btn');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
+
+    function getActiveModel() {
+        return document.querySelector(`.furniture-model[data-category="${currentCategory}"]`);
+    }
+
+    function updateActiveTarget() {
+        document.querySelectorAll('.furniture-model').forEach((model) => {
+            const isActive = model.getAttribute('data-category') === currentCategory;
+            model.setAttribute('visible', isActive);
+        });
+    }
 
     // Helper function to update the model source
     function updateModel() {
         const modelsList = furnitureData[currentCategory];
         const newModelPath = modelsList[currentIndex];
-        modelEntity.setAttribute('src', newModelPath);
+        getActiveModel().setAttribute('src', newModelPath);
     }
 
     // Category Selector Buttons
@@ -114,8 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Switch category and reset index to 0
             currentCategory = e.target.getAttribute('data-category');
-            currentIndex = 0; 
-            
+            currentIndex = 0;
+
+            updateActiveTarget();
             updateModel();
         });
     });

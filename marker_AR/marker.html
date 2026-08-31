@@ -42,15 +42,57 @@
     >
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
+      <!-- targetIndex 0 = Chair marker, 1 = Sofa, 2 = Cupboard, 3 = Table -->
       <a-entity mindar-image-target="targetIndex: 0">
-        <!-- Added gesture-handler and updated the folder path -->
         <a-gltf-model
           id="furniture-model"
+          class="furniture-model"
+          data-category="chair"
           src="../assets/models/chair/chair_1.glb"
           position="0 0 0.1"
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
           gesture-handler
+          visible="true"
+        ></a-gltf-model>
+      </a-entity>
+
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-gltf-model
+          class="furniture-model"
+          data-category="sofa"
+          src="../assets/models/sofa/sofa_1.glb"
+          position="0 0 0.1"
+          scale="0.6 0.6 0.6"
+          rotation="0 0 0"
+          gesture-handler
+          visible="false"
+        ></a-gltf-model>
+      </a-entity>
+
+      <a-entity mindar-image-target="targetIndex: 2">
+        <a-gltf-model
+          class="furniture-model"
+          data-category="cupboard"
+          src="../assets/models/cupboard/cupboard_1.glb"
+          position="0 0 0.1"
+          scale="0.6 0.6 0.6"
+          rotation="0 0 0"
+          gesture-handler
+          visible="false"
+        ></a-gltf-model>
+      </a-entity>
+
+      <a-entity mindar-image-target="targetIndex: 3">
+        <a-gltf-model
+          class="furniture-model"
+          data-category="table"
+          src="../assets/models/table/table_1.glb"
+          position="0 0 0.1"
+          scale="0.6 0.6 0.6"
+          rotation="0 0 0"
+          gesture-handler
+          visible="false"
         ></a-gltf-model>
       </a-entity>
     </a-scene>
