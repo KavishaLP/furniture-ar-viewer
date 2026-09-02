@@ -5,26 +5,23 @@ AFRAME.registerComponent('gesture-handler', {
     schema: {
         minScale: { default: 0.2 },
         maxScale: { default: 3.0 },
-        rotationSensitivity: { default: 0.05 } // Adjust for faster/slower rotation
+        rotationSensitivity: { default: 0.05 }
     },
     init: function () {
-        this.touchState = { 
-            isDown: false, 
-            initialDistance: 0, 
-            initialScale: 0.6, 
-            lastX: 0 
+        this.touchState = {
+            isDown: false,
+            initialDistance: 0,
+            initialScale: 0.6,
+            lastX: 0
         };
-        
-        // Listen to touches on the canvas
+
         const canvas = this.el.sceneEl.canvas;
-        
+
         canvas.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
-                // One finger: setup rotation
                 this.touchState.isDown = true;
                 this.touchState.lastX = e.touches[0].clientX;
             } else if (e.touches.length === 2) {
-                // Two fingers: setup scale
                 this.touchState.isDown = true;
                 this.touchState.initialDistance = Math.hypot(
                     e.touches[0].clientX - e.touches[1].clientX,
@@ -36,22 +33,18 @@ AFRAME.registerComponent('gesture-handler', {
 
         canvas.addEventListener('touchmove', (e) => {
             if (!this.touchState.isDown) return;
-            
+
             if (e.touches.length === 1) {
-                // One finger: rotate model around Y axis
                 const deltaX = e.touches[0].clientX - this.touchState.lastX;
                 this.el.object3D.rotation.y += deltaX * this.data.rotationSensitivity;
                 this.touchState.lastX = e.touches[0].clientX;
             } else if (e.touches.length === 2) {
-                // Two fingers: scale model
                 const currentDistance = Math.hypot(
                     e.touches[0].clientX - e.touches[1].clientX,
                     e.touches[0].clientY - e.touches[1].clientY
                 );
                 const scaleFactor = currentDistance / this.touchState.initialDistance;
                 let newScale = this.touchState.initialScale * scaleFactor;
-                
-                // Clamp scale to min/max bounds
                 newScale = Math.max(this.data.minScale, Math.min(this.data.maxScale, newScale));
                 this.el.object3D.scale.set(newScale, newScale, newScale);
             }
@@ -66,11 +59,9 @@ AFRAME.registerComponent('gesture-handler', {
 });
 
 // ==========================================
-// 2. UI LOGIC (CAROUSEL & MODEL SWAPPING)
+// 2. AUTO-DETECT TARGET & MODEL SWAPPING
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Updated Database mapping to your new folder structure
+function initMarkerUi() {
     const furnitureData = {
         chair: [
             '../assets/models/chair/chair_1.glb',
@@ -90,68 +81,92 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
-    let currentCategory = 'chair';
-    let currentIndex = 0;
+    const categoryIndices = { chair: 0, sofa: 0, cupboard: 0, table: 0 };
+    let activeCategory = null;
 
-    const categoryButtons = document.querySelectorAll('.category-btn');
+    const detectedLabel = document.getElementById('detected-category');
+    const modelStatus = document.getElementById('model-status');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
+    const prevBtnMobile = document.getElementById('prev-btn-mobile');
+    const nextBtnMobile = document.getElementById('next-btn-mobile');
+    const targetEntities = document.querySelectorAll('[mindar-image-target]');
 
     function getActiveModel() {
-        return document.querySelector(`.furniture-model[data-category="${currentCategory}"]`);
+        if (!activeCategory) return null;
+        const target = document.querySelector(`[mindar-image-target][data-category="${activeCategory}"]`);
+        return target ? target.querySelector('.furniture-model') : null;
     }
 
-    function updateActiveTarget() {
-        document.querySelectorAll('.furniture-model').forEach((model) => {
-            const isActive = model.getAttribute('data-category') === currentCategory;
-            model.setAttribute('visible', isActive);
-        });
+    function updateStatusText() {
+        if (!activeCategory) {
+            modelStatus.textContent = 'Waiting for marker…';
+            return;
+        }
+        const modelsList = furnitureData[activeCategory];
+        const fileName = modelsList[categoryIndices[activeCategory]].split('/').pop();
+        modelStatus.textContent = `${activeCategory} · ${fileName}`;
     }
 
-    // Helper function to update the model source
     function updateModel() {
-        const modelsList = furnitureData[currentCategory];
-        const newModelPath = modelsList[currentIndex];
-        getActiveModel().setAttribute('src', newModelPath);
+        const model = getActiveModel();
+        if (!model || !activeCategory) return;
+        const modelsList = furnitureData[activeCategory];
+        model.setAttribute('src', modelsList[categoryIndices[activeCategory]]);
+        updateStatusText();
     }
 
-    // Category Selector Buttons
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            // Update active styling
-            categoryButtons.forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
+    function setActiveCategory(category) {
+        activeCategory = category;
+        detectedLabel.textContent = category;
+        detectedLabel.classList.add('active');
+        updateModel();
+    }
 
-            // Switch category and reset index to 0
-            currentCategory = e.target.getAttribute('data-category');
-            currentIndex = 0;
+    function clearCategory() {
+        activeCategory = null;
+        detectedLabel.textContent = 'Scan a marker to begin';
+        detectedLabel.classList.remove('active');
+        modelStatus.textContent = 'Waiting for marker…';
+    }
 
-            updateActiveTarget();
-            updateModel();
+    targetEntities.forEach((target) => {
+        target.addEventListener('targetFound', () => {
+            setActiveCategory(target.getAttribute('data-category'));
+        });
+
+        target.addEventListener('targetLost', () => {
+            if (activeCategory === target.getAttribute('data-category')) {
+                clearCategory();
+            }
         });
     });
 
-    // Next Button (>)
-    nextBtn.addEventListener('click', () => {
-        const modelsList = furnitureData[currentCategory];
-        currentIndex++;
-        
-        // Loop back to the first model if we exceed the array length
-        if (currentIndex >= modelsList.length) {
-            currentIndex = 0;
-        }
+    function goNext() {
+        if (!activeCategory) return;
+        const modelsList = furnitureData[activeCategory];
+        categoryIndices[activeCategory] = (categoryIndices[activeCategory] + 1) % modelsList.length;
         updateModel();
-    });
+    }
 
-    // Previous Button (<)
-    prevBtn.addEventListener('click', () => {
-        const modelsList = furnitureData[currentCategory];
-        currentIndex--;
-        
-        // Loop to the last model if we drop below 0
-        if (currentIndex < 0) {
-            currentIndex = modelsList.length - 1;
-        }
+    function goPrev() {
+        if (!activeCategory) return;
+        const modelsList = furnitureData[activeCategory];
+        categoryIndices[activeCategory] = (categoryIndices[activeCategory] - 1 + modelsList.length) % modelsList.length;
         updateModel();
-    });
+    }
+
+    nextBtn.addEventListener('click', goNext);
+    prevBtn.addEventListener('click', goPrev);
+    nextBtnMobile.addEventListener('click', goNext);
+    prevBtnMobile.addEventListener('click', goPrev);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sceneEl = document.querySelector('a-scene');
+    if (sceneEl.hasLoaded) {
+        initMarkerUi();
+    } else {
+        sceneEl.addEventListener('loaded', initMarkerUi, { once: true });
+    }
 });

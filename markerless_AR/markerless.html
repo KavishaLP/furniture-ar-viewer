@@ -4,65 +4,72 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <title>Markerless AR - Room Planner</title>
-    
+
     <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
     <link rel="stylesheet" href="../style/style.css">
-    
     <script src="./interactions.js"></script>
   </head>
 
   <body>
-    <!-- 1. SELECTION UI -->
-    <div id="selection-ui" class="dashboard-body" style="position: absolute; z-index: 999; width: 100%; height: 100%; top: 0; left: 0;">
-        <div class="dashboard-container">
-            <h2 style="margin-bottom: 20px;">Select Furniture to Place</h2>
-            
-            <div class="category-carousel" style="position: relative; margin-bottom: 30px;">
+    <!-- Selection UI -->
+    <div id="selection-ui" class="selection-panel">
+        <div class="selection-card">
+            <h2>Room Planner</h2>
+            <p class="selection-subtitle">Choose furniture, then place it in your room</p>
+
+            <div class="category-grid">
                 <button class="category-btn active" data-category="chair">Chair</button>
                 <button class="category-btn" data-category="sofa">Sofa</button>
                 <button class="category-btn" data-category="cupboard">Cupboard</button>
                 <button class="category-btn" data-category="table">Table</button>
             </div>
-            
-            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 40px;">
-                <button id="prev-btn" class="nav-btn" style="position: static; transform: none;">&lt;</button>
-                <div id="model-preview-text" style="font-size: 1.2rem; font-weight: bold; min-width: 150px;">chair_1.glb</div>
-                <button id="next-btn" class="nav-btn" style="position: static; transform: none;">&gt;</button>
+
+            <div class="model-picker">
+                <button id="prev-btn" class="nav-btn nav-btn-inline">&lt;</button>
+                <div id="model-preview-text">chair_1.glb</div>
+                <button id="next-btn" class="nav-btn nav-btn-inline">&gt;</button>
             </div>
 
-            <button id="start-ar-btn" class="main-btn" style="width: 100%; margin-bottom: 15px;">Start Markerless AR</button>
-            <a href="../index.html" class="main-btn secondary" style="display: block; width: 100%; box-sizing: border-box;">Back to Dashboard</a>
+            <div class="action-stack">
+                <button id="start-ar-btn" class="main-btn">Start Markerless AR</button>
+                <p id="ar-status">Use Chrome on Android over HTTPS to open the camera.</p>
+                <a href="../index.html" class="main-btn secondary">Back to Dashboard</a>
+            </div>
         </div>
     </div>
 
-    <!-- 2. AR OVERLAY -->
-    <!-- We must pass this ID to the WebXR DOM Overlay system -->
+    <!-- AR Overlay -->
     <div id="ar-ui" class="ar-ui-layer" style="display: none;">
-        <a href="../index.html" class="back-btn">Exit AR</a>
-        <button id="place-btn" class="main-btn" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); pointer-events: auto; padding: 15px 40px; z-index: 9999;">Place Furniture Here</button>
+        <div class="ar-top-bar">
+            <button id="exit-ar-btn" class="exit-ar-btn" type="button">Exit AR</button>
+        </div>
+        <div class="ar-bottom-bar">
+            <button id="place-btn" class="place-btn" type="button">Place Furniture Here</button>
+            <p class="ar-hint" id="gesture-hint" style="display: none;">Drag to rotate · Pinch to scale</p>
+        </div>
     </div>
 
-    <!-- 3. THE A-FRAME WEBXR SCENE -->
-    <!-- FIX: Added dom-overlay and overlayElement to make HTML buttons clickable in AR -->
-    <a-scene 
-        webxr="requiredFeatures: hit-test,local-floor; optionalFeatures: dom-overlay; overlayElement: #ar-ui;"
-        renderer="colorManagement: true, physicallyCorrectLights"
+    <audio id="placement-sound" preload="auto" src="../assets/audio/place-furniture.mp3"></audio>
+
+    <!-- WebXR Scene -->
+    <a-scene
+        webxr="requiredFeatures: hit-test; optionalFeatures: local-floor, local, dom-overlay; overlayElement: #ar-ui;"
+        renderer="alpha: true; colorManagement: true; physicallyCorrectLights: true"
         vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
         markerless-placement
     >
         <a-camera position="0 1.6 0"></a-camera>
 
-        <!-- Reticle -->
         <a-entity id="reticle" visible="false">
             <a-ring color="#e94560" radius-inner="0.1" radius-outer="0.15" rotation="-90 0 0"></a-ring>
         </a-entity>
 
-        <!-- FIX: Start with scale 0 instead of visible=false to ensure the 3D engine loads it into memory immediately -->
-        <a-gltf-model 
-            id="placed-model" 
-            position="0 0 0" 
-            scale="0 0 0" 
-            gesture-handler
+        <a-gltf-model
+            id="placed-model"
+            position="0 0 0"
+            scale="0 0 0"
+            gesture-handler="placementMode: true"
         ></a-gltf-model>
     </a-scene>
   </body>

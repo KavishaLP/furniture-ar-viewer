@@ -3,18 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Furniture Planner</title>
+    <title>AR Furniture Viewer | INTE 42312</title>
     <link rel="stylesheet" href="./style/style.css">
 </head>
 <body class="dashboard-body">
     <div class="dashboard-container">
-        <h1>AR Furniture Planner</h1>
-        <p>Visualize furniture in your room before you buy.</p>
-        
-        <div class="button-group">
-            <a href="./marker_AR/marker.html" class="main-btn">Scan Catalogue (Marker AR)</a>
-            <a href="./markerless_AR/markerless.html" class="main-btn secondary">Plan My Room (Markerless AR)</a>
+        <span class="dashboard-badge">INTE 42312 · Virtual &amp; Augmented Reality</span>
+        <h1>AR Furniture Catalogue</h1>
+        <p class="subtitle">
+            Visualize chairs, sofas, cupboards and tables in augmented reality —
+            using marker-based scanning or markerless room placement.
+        </p>
+
+        <div class="dashboard-cards">
+            <a href="./marker_AR/marker.html" class="mode-card">
+                <div class="mode-card-icon marker">📷</div>
+                <div class="mode-card-content">
+                    <h3>Marker AR — Scan Catalogue</h3>
+                    <p>Scan a printed target image to view furniture models in AR</p>
+                </div>
+            </a>
+            <a href="./markerless_AR/markerless.html" class="mode-card">
+                <div class="mode-card-icon markerless">🏠</div>
+                <div class="mode-card-content">
+                    <h3>Markerless AR — Room Planner</h3>
+                    <p>Place furniture anywhere in your room without a marker</p>
+                </div>
+            </a>
         </div>
+
+        <p class="dashboard-footer">Assignment 01 · Furniture AR Viewer</p>
     </div>
 </body>
 </html>

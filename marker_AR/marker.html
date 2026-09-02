@@ -2,37 +2,35 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Scan Catalogue - AR</title>
 
     <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <link rel="stylesheet" href="../style/style.css">
-    
-    <!-- MUST be loaded in the head so the gesture component registers before the scene -->
     <script src="./marker-ui.js"></script>
   </head>
 
   <body>
-    <!-- The UI Overlay -->
-    <div class="ar-ui-layer">
-        <!-- Top Carousel (Categories) -->
-        <div class="category-carousel">
-            <button class="category-btn active" data-category="chair">Chair</button>
-            <button class="category-btn" data-category="sofa">Sofa</button>
-            <button class="category-btn" data-category="cupboard">Cupboard</button>
-            <button class="category-btn" data-category="table">Table</button>
+    <div class="ar-ui-layer marker-ar-ui">
+        <div class="ar-top-bar marker-ar-top">
+            <a href="../index.html" class="exit-ar-btn">Back</a>
+            <div id="detected-category" class="detected-label">Scan a marker to begin</div>
         </div>
 
-        <!-- Left/Right Model Navigators -->
-        <button id="prev-btn" class="nav-btn left">&lt;</button>
-        <button id="next-btn" class="nav-btn right">&gt;</button>
+        <button id="prev-btn" class="nav-btn nav-btn-side left" aria-label="Previous model">&lt;</button>
+        <button id="next-btn" class="nav-btn nav-btn-side right" aria-label="Next model">&gt;</button>
 
-        <!-- Back Button -->
-        <a href="../index.html" class="back-btn">Back</a>
+        <div class="ar-bottom-bar marker-ar-bottom">
+            <div class="marker-model-nav">
+                <button id="prev-btn-mobile" class="nav-btn nav-btn-inline" aria-label="Previous model">&lt;</button>
+                <span id="model-status" class="model-status-text">Waiting for marker…</span>
+                <button id="next-btn-mobile" class="nav-btn nav-btn-inline" aria-label="Next model">&gt;</button>
+            </div>
+            <p class="ar-hint">Drag to rotate · Pinch to scale</p>
+        </div>
     </div>
 
-    <!-- The AR Scene -->
     <a-scene
       mindar-image="imageTargetSrc: ../assets/markers/targets.mind;"
       color-space="sRGB"
@@ -42,10 +40,8 @@
     >
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- targetIndex 0 = Chair marker, 1 = Sofa, 2 = Cupboard, 3 = Table -->
-      <a-entity mindar-image-target="targetIndex: 0">
+      <a-entity mindar-image-target="targetIndex: 0" data-category="chair">
         <a-gltf-model
-          id="furniture-model"
           class="furniture-model"
           data-category="chair"
           src="../assets/models/chair/chair_1.glb"
@@ -53,11 +49,10 @@
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
           gesture-handler
-          visible="true"
         ></a-gltf-model>
       </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 1">
+      <a-entity mindar-image-target="targetIndex: 1" data-category="sofa">
         <a-gltf-model
           class="furniture-model"
           data-category="sofa"
@@ -66,11 +61,10 @@
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
           gesture-handler
-          visible="false"
         ></a-gltf-model>
       </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 2">
+      <a-entity mindar-image-target="targetIndex: 2" data-category="cupboard">
         <a-gltf-model
           class="furniture-model"
           data-category="cupboard"
@@ -79,11 +73,10 @@
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
           gesture-handler
-          visible="false"
         ></a-gltf-model>
       </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 3">
+      <a-entity mindar-image-target="targetIndex: 3" data-category="table">
         <a-gltf-model
           class="furniture-model"
           data-category="table"
@@ -92,7 +85,6 @@
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
           gesture-handler
-          visible="false"
         ></a-gltf-model>
       </a-entity>
     </a-scene>
