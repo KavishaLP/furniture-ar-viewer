@@ -54,23 +54,30 @@
     <!-- WebXR Scene -->
     <a-scene
         webxr="requiredFeatures: hit-test; optionalFeatures: local-floor, local, dom-overlay; overlayElement: #ar-ui;"
-        renderer="alpha: true; colorManagement: true; physicallyCorrectLights: true"
+        renderer="alpha: true; colorManagement: true; physicallyCorrectLights: false"
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false"
         markerless-placement
     >
         <a-camera position="0 1.6 0"></a-camera>
 
+        <!-- Fixed lighting for the 3D model (shadow is projected separately) -->
+        <a-entity light="type: ambient; color: #ffffff; intensity: 0.55"></a-entity>
+        <a-entity light="type: directional; color: #fff8ee; intensity: 0.75" position="1.2 4 1.8" rotation="-55 35 0"></a-entity>
+
         <a-entity id="reticle" visible="false">
             <a-ring color="#e94560" radius-inner="0.1" radius-outer="0.15" rotation="-90 0 0"></a-ring>
         </a-entity>
 
-        <a-gltf-model
-            id="placed-model"
-            position="0 0 0"
-            scale="0 0 0"
-            gesture-handler="placementMode: true"
-        ></a-gltf-model>
+        <a-entity id="furniture-root" visible="false">
+            <a-gltf-model
+                id="placed-model"
+                position="0 0 0"
+                scale="0 0 0"
+                gesture-handler="placementMode: true"
+                model-side-shadow="opacity: 0.62"
+            ></a-gltf-model>
+        </a-entity>
     </a-scene>
   </body>
 </html>
