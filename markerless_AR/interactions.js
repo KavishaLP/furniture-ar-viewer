@@ -61,11 +61,6 @@ AFRAME.registerComponent('gesture-handler', {
         if (e.touches.length === 1) {
             const deltaX = e.touches[0].clientX - this.touchState.lastX;
             this.el.object3D.rotation.y += deltaX * this.data.rotationSensitivity;
-            this.el.setAttribute('rotation', {
-                x: THREE.MathUtils.radToDeg(this.el.object3D.rotation.x),
-                y: THREE.MathUtils.radToDeg(this.el.object3D.rotation.y),
-                z: THREE.MathUtils.radToDeg(this.el.object3D.rotation.z)
-            });
             this.touchState.lastX = e.touches[0].clientX;
         } else if (e.touches.length === 2) {
             const currentDistance = Math.hypot(
@@ -86,126 +81,7 @@ AFRAME.registerComponent('gesture-handler', {
 });
 
 // ==========================================
-// 2. SIDE PROJECTED SHADOW (fixed light, model shape)
-// Light from front-left → shadow falls to back-right on floor
-// ==========================================
-AFRAME.registerComponent('model-side-shadow', {
-    schema: {
-        opacity: { default: 0.62 },
-        floorY: { default: 0.004 }
-    },
-    init: function () {
-        // Fixed world-space light direction (sun front-left, above)
-        this.lightDir = new THREE.Vector3(0.55, -1.0, 0.45).normalize();
-        this.shadowMeshes = [];
-        this.shadowGroup = new THREE.Group();
-        this.rootEl = document.getElementById('furniture-root');
-        this.rootEl.object3D.add(this.shadowGroup);
-        this.shadowGroup.renderOrder = -1;
-
-        this.temp = new THREE.Vector3();
-        this.rootInverse = new THREE.Matrix4();
-        this.lastRotY = null;
-        this.lastScale = null;
-
-        this.shadowMaterial = new THREE.MeshBasicMaterial({
-            color: 0x000000,
-            transparent: true,
-            opacity: this.data.opacity,
-            depthWrite: false,
-            polygonOffset: true,
-            polygonOffsetFactor: -4,
-            polygonOffsetUnits: -4,
-            side: THREE.DoubleSide
-        });
-
-        this.buildShadowMeshes = this.buildShadowMeshes.bind(this);
-        this.el.addEventListener('model-loaded', this.buildShadowMeshes);
-        if (this.el.getObject3D('mesh')) {
-            this.buildShadowMeshes();
-        }
-    },
-    buildShadowMeshes: function () {
-        this.shadowMeshes.forEach(({ shadow, geometry }) => {
-            this.shadowGroup.remove(shadow);
-            geometry.dispose();
-        });
-        this.shadowMeshes = [];
-
-        this.el.object3D.traverse((node) => {
-            if (!node.isMesh || !node.geometry) return;
-
-            const geometry = node.geometry.clone();
-            const shadow = new THREE.Mesh(geometry, this.shadowMaterial);
-            this.shadowMeshes.push({ source: node, shadow, geometry });
-            this.shadowGroup.add(shadow);
-        });
-
-        this.lastRotY = null;
-        this.lastScale = null;
-    },
-    updateShadow: function () {
-        if (this.el.object3D.scale.x < 0.05 || this.shadowMeshes.length === 0) {
-            this.shadowGroup.visible = false;
-            return;
-        }
-
-        this.shadowGroup.visible = true;
-        this.rootEl.object3D.updateWorldMatrix(true, false);
-        this.rootInverse.copy(this.rootEl.object3D.matrixWorld).invert();
-
-        const floorY = this.data.floorY;
-        const L = this.lightDir;
-
-        this.shadowMeshes.forEach(({ source, shadow, geometry }) => {
-            source.updateWorldMatrix(true, false);
-            const srcPos = source.geometry.attributes.position;
-            const dstPos = geometry.attributes.position;
-
-            for (let i = 0; i < srcPos.count; i++) {
-                this.temp.set(srcPos.getX(i), srcPos.getY(i), srcPos.getZ(i));
-                this.temp.applyMatrix4(source.matrixWorld);
-                this.temp.applyMatrix4(this.rootInverse);
-
-                const t = (floorY - this.temp.y) / L.y;
-                this.temp.x += L.x * t;
-                this.temp.y = floorY;
-                this.temp.z += L.z * t;
-
-                dstPos.setXYZ(i, this.temp.x, this.temp.y, this.temp.z);
-            }
-
-            dstPos.needsUpdate = true;
-            geometry.computeBoundingSphere();
-            shadow.position.set(0, 0, 0);
-            shadow.rotation.set(0, 0, 0);
-            shadow.scale.set(1, 1, 1);
-        });
-    },
-    tick: function () {
-        const rotY = this.el.object3D.rotation.y;
-        const scale = this.el.object3D.scale.x;
-
-        if (this.lastRotY === rotY && this.lastScale === scale && this.shadowGroup.visible) {
-            return;
-        }
-
-        this.lastRotY = rotY;
-        this.lastScale = scale;
-        this.updateShadow();
-    },
-    remove: function () {
-        this.el.removeEventListener('model-loaded', this.buildShadowMeshes);
-        this.shadowMeshes.forEach(({ shadow, geometry }) => {
-            this.shadowGroup.remove(shadow);
-            geometry.dispose();
-        });
-        this.shadowMeshes = [];
-    }
-});
-
-// ==========================================
-// 3. WEBXR HIT-TESTING & PLACEMENT LOGIC
+// 2. WEBXR HIT-TESTING & PLACEMENT LOGIC
 // ==========================================
 function playPlacementSound() {
     const audio = document.getElementById('placement-sound');
@@ -213,6 +89,64 @@ function playPlacementSound() {
     audio.currentTime = 0;
     audio.play().catch(() => {});
 }
+
+function enableModelCastShadow(modelEl) {
+    const apply = () => {
+        modelEl.object3D.traverse((node) => {
+            if (node.isMesh) {
+                node.castShadow = true;
+                node.receiveShadow = false;
+            }
+        });
+    };
+    modelEl.addEventListener('model-loaded', apply);
+    if (modelEl.getObject3D('mesh')) apply();
+}
+
+function aimKeyLightAtFloor(position) {
+    const keyLightEl = document.getElementById('key-light');
+    if (!keyLightEl) return;
+
+    keyLightEl.setAttribute('position', {
+        x: position.x - 2.2,
+        y: position.y + 4.5,
+        z: position.z + 1.8
+    });
+
+    const light = keyLightEl.getObject3D('light');
+    if (light && light.target) {
+        light.target.position.set(position.x, position.y, position.z);
+        light.target.updateMatrixWorld();
+        if (!light.target.parent) {
+            keyLightEl.object3D.parent.add(light.target);
+        }
+    }
+}
+
+function showShadowOnDetectedFloor(position) {
+    const shadowFloor = document.getElementById('shadow-floor');
+    if (!shadowFloor) return;
+    shadowFloor.setAttribute('position', {
+        x: position.x,
+        y: position.y + 0.003,
+        z: position.z
+    });
+    shadowFloor.setAttribute('visible', true);
+}
+
+function hideShadowFloor() {
+    const shadowFloor = document.getElementById('shadow-floor');
+    if (shadowFloor) shadowFloor.setAttribute('visible', false);
+}
+
+AFRAME.registerComponent('ar-floor-shadows', {
+    init: function () {
+        const renderer = this.el.renderer;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        enableModelCastShadow(document.getElementById('placed-model'));
+    }
+});
 
 AFRAME.registerComponent('markerless-placement', {
     init: function () {
@@ -222,7 +156,6 @@ AFRAME.registerComponent('markerless-placement', {
         this.modelPlaced = false;
 
         this.reticle = document.getElementById('reticle');
-        this.furnitureRoot = document.getElementById('furniture-root');
         this.placedModel = document.getElementById('placed-model');
         this.placeBtn = document.getElementById('place-btn');
         this.gestureHint = document.getElementById('gesture-hint');
@@ -232,26 +165,13 @@ AFRAME.registerComponent('markerless-placement', {
             if (!this.reticle.object3D.visible || this.modelPlaced) return;
 
             const position = this.reticle.getAttribute('position');
-            this.furnitureRoot.setAttribute('position', {
-                x: position.x,
-                y: position.y,
-                z: position.z
-            });
-            this.furnitureRoot.setAttribute('visible', true);
-            this.furnitureRoot.object3D.visible = true;
-
-            this.placedModel.setAttribute('position', '0 0 0');
-            this.placedModel.setAttribute('rotation', '0 0 0');
+            this.placedModel.setAttribute('position', { x: position.x, y: position.y, z: position.z });
             this.placedModel.setAttribute('scale', '0.6 0.6 0.6');
             this.placedModel.object3D.visible = true;
             this.modelPlaced = true;
 
-            const shadowComp = this.placedModel.components['model-side-shadow'];
-            if (shadowComp) {
-                shadowComp.lastRotY = null;
-                shadowComp.lastScale = null;
-                shadowComp.updateShadow();
-            }
+            showShadowOnDetectedFloor(position);
+            aimKeyLightAtFloor(position);
 
             this.reticle.object3D.visible = false;
             this.reticle.setAttribute('visible', false);
@@ -295,8 +215,7 @@ AFRAME.registerComponent('markerless-placement', {
             this.refSpace = null;
             this.modelPlaced = false;
             this.reticle.object3D.visible = false;
-            this.furnitureRoot.setAttribute('visible', false);
-            this.furnitureRoot.object3D.visible = false;
+            hideShadowFloor();
             this.placeBtn.textContent = 'Place Furniture Here';
             this.placeBtn.style.opacity = '1';
             if (this.gestureHint) this.gestureHint.style.display = 'none';
@@ -473,6 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
         arStatus.textContent = 'Use Chrome on Android over HTTPS to open the camera.';
         arStatus.style.color = '#a9a9b3';
         placedModel.setAttribute('scale', '0 0 0');
-        document.getElementById('furniture-root').setAttribute('visible', false);
+        hideShadowFloor();
     });
 });

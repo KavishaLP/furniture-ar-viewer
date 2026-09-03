@@ -54,30 +54,47 @@
     <!-- WebXR Scene -->
     <a-scene
         webxr="requiredFeatures: hit-test; optionalFeatures: local-floor, local, dom-overlay; overlayElement: #ar-ui;"
-        renderer="alpha: true; colorManagement: true; physicallyCorrectLights: false"
+        renderer="alpha: true; colorManagement: true; physicallyCorrectLights: true; shadowMapEnabled: true; shadowMapType: pcfsoft"
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false"
         markerless-placement
+        ar-floor-shadows
     >
         <a-camera position="0 1.6 0"></a-camera>
 
-        <!-- Fixed lighting for the 3D model (shadow is projected separately) -->
-        <a-entity light="type: ambient; color: #ffffff; intensity: 0.55"></a-entity>
-        <a-entity light="type: directional; color: #fff8ee; intensity: 0.75" position="1.2 4 1.8" rotation="-55 35 0"></a-entity>
+        <!-- Fill lights (do not cast shadows) -->
+        <a-entity light="type: ambient; color: #ffffff; intensity: 0.45"></a-entity>
+        <a-entity light="type: hemisphere; color: #ffffff; groundColor: #8a8a8a; intensity: 0.55"></a-entity>
+
+        <!-- Key light: fixed direction, casts shadow onto the detected floor -->
+        <a-entity
+            id="key-light"
+            light="type: directional; color: #fff4e6; intensity: 1.05; castShadow: true; shadowMapWidth: 2048; shadowMapHeight: 2048; shadowCameraNear: 0.2; shadowCameraFar: 12; shadowCameraLeft: -2; shadowCameraRight: 2; shadowCameraTop: 2; shadowCameraBottom: -2; shadowBias: -0.0004; shadowRadius: 2"
+            position="-2.2 4.5 1.8"
+        ></a-entity>
 
         <a-entity id="reticle" visible="false">
             <a-ring color="#e94560" radius-inner="0.1" radius-outer="0.15" rotation="-90 0 0"></a-ring>
         </a-entity>
 
-        <a-entity id="furniture-root" visible="false">
-            <a-gltf-model
-                id="placed-model"
-                position="0 0 0"
-                scale="0 0 0"
-                gesture-handler="placementMode: true"
-                model-side-shadow="opacity: 0.62"
-            ></a-gltf-model>
-        </a-entity>
+        <!-- Invisible floor plane: only the shadow is drawn on the detected surface -->
+        <a-plane
+            id="shadow-floor"
+            rotation="-90 0 0"
+            width="4"
+            height="4"
+            visible="false"
+            material="shader: shadow; transparent: true; opacity: 0.55"
+            shadow="receive: true; cast: false"
+        ></a-plane>
+
+        <a-gltf-model
+            id="placed-model"
+            position="0 0 0"
+            scale="0 0 0"
+            shadow="cast: true; receive: false"
+            gesture-handler="placementMode: true"
+        ></a-gltf-model>
     </a-scene>
   </body>
 </html>
