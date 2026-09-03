@@ -134,6 +134,54 @@ body {
     color: var(--text-muted);
 }
 
+.dashboard-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* ===================== REFERENCES PAGE ===================== */
+.references-page {
+    overflow-y: auto;
+    align-items: flex-start;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.references-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    margin-top: 8px;
+}
+
+.reference-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+}
+
+.reference-card h3 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+}
+
+.reference-card .author {
+    margin: 0 0 10px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.reference-card a {
+    color: #7eb8ff;
+    font-size: 0.8rem;
+    word-break: break-all;
+    line-height: 1.45;
+}
+
 /* ===================== MARKERLESS SELECT UI ===================== */
 .selection-panel {
     position: absolute;

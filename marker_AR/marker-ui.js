@@ -66,8 +66,7 @@ function initMarkerUi() {
         chair: [
             '../assets/models/chair/chair_1.glb',
             '../assets/models/chair/chair_2.glb',
-            '../assets/models/chair/chair_3.glb',
-            '../assets/models/chair/chair_4.glb'
+            '../assets/models/chair/chair_3.glb'
         ],
         sofa: [
             '../assets/models/sofa/sofa_1.glb',
