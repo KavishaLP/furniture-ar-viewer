@@ -56,7 +56,7 @@
                 <ul>
                     <li>Hold the phone so you can see the floor, and move it slowly left and right.</li>
                     <li>A circle appears on the floor — that is the spot where the furniture will stand.</li>
-                    <li>Tap <strong>Place it here</strong>. Then turn it with one finger, pinch to resize, or tap <strong>Add another</strong> to put more pieces on the floor.</li>
+                    <li>Tap <strong>Place it here</strong>. Then turn it with one finger, pinch to resize, or tap <strong>Add another</strong> to choose a type and design for the next piece.</li>
                 </ul>
             </div>
         </div>
@@ -75,7 +75,7 @@
         </div>
 
         <div id="ar-picker" class="ar-picker" hidden>
-            <p class="ar-picker-title">Pick the next piece, then tap the floor circle</p>
+            <p class="ar-picker-title">Choose furniture type and design</p>
             <div class="ar-picker-cats">
                 <button class="ar-category-btn active" type="button" data-category="chair">Chair</button>
                 <button class="ar-category-btn" type="button" data-category="sofa">Sofa</button>
@@ -90,7 +90,10 @@
                 </div>
                 <button id="ar-next-btn" class="nav-btn nav-btn-inline" type="button" aria-label="Next design">&gt;</button>
             </div>
-            <button id="ar-picker-cancel" class="undo-btn" type="button">Cancel</button>
+            <div class="ar-picker-actions">
+                <button id="ar-picker-confirm" class="place-btn" type="button">Use this piece</button>
+                <button id="ar-picker-cancel" class="undo-btn" type="button">Cancel</button>
+            </div>
         </div>
 
         <div class="ar-bottom-bar">

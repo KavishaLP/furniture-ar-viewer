@@ -271,7 +271,7 @@ function updateMarkerlessHud() {
     const picking = MarkerlessState.pickerOpen;
     const awaiting = MarkerlessState.awaitingFloor;
 
-    if (placeBtn) placeBtn.hidden = !awaiting;
+    if (placeBtn) placeBtn.hidden = !awaiting || picking;
     if (arrangeRow) arrangeRow.hidden = awaiting || picking || count === 0;
     if (picker) picker.hidden = !picking;
     if (undoBtn) undoBtn.disabled = count === 0;
@@ -315,6 +315,7 @@ AFRAME.registerComponent('markerless-placement', {
         this.placeBtn = document.getElementById('place-btn');
         this.addAnotherBtn = document.getElementById('add-another-btn');
         this.undoLastBtn = document.getElementById('undo-last-btn');
+        this.pickerConfirmBtn = document.getElementById('ar-picker-confirm');
         this.pickerCancelBtn = document.getElementById('ar-picker-cancel');
         this.clearAllBtn = document.getElementById('clear-all-btn');
         this.newFloorBtn = document.getElementById('new-floor-btn');
@@ -326,6 +327,7 @@ AFRAME.registerComponent('markerless-placement', {
         };
 
         this.placeModel = () => {
+            if (MarkerlessState.pickerOpen) return;
             if (!MarkerlessState.awaitingFloor) return;
             if (!this.reticle.object3D.visible) return;
 
@@ -373,8 +375,15 @@ AFRAME.registerComponent('markerless-placement', {
 
         this.openPicker = () => {
             MarkerlessState.pickerOpen = true;
-            MarkerlessState.awaitingFloor = true;
+            MarkerlessState.awaitingFloor = false;
+            this.hideReticle();
             if (typeof window.syncArPickerPreview === 'function') window.syncArPickerPreview();
+            updateMarkerlessHud();
+        };
+
+        this.confirmPicker = () => {
+            MarkerlessState.pickerOpen = false;
+            MarkerlessState.awaitingFloor = true;
             updateMarkerlessHud();
         };
 
@@ -408,6 +417,12 @@ AFRAME.registerComponent('markerless-placement', {
             this.undoLastBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.undoLast();
+            });
+        }
+        if (this.pickerConfirmBtn) {
+            this.pickerConfirmBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.confirmPicker();
             });
         }
         if (this.pickerCancelBtn) {
@@ -471,7 +486,7 @@ AFRAME.registerComponent('markerless-placement', {
         const sceneEl = this.el.sceneEl;
         if (!sceneEl.is('ar-mode') || !this.viewerSpace || !this.xrHitTestSource || !this.refSpace) return;
 
-        if (!MarkerlessState.awaitingFloor) {
+        if (MarkerlessState.pickerOpen || !MarkerlessState.awaitingFloor) {
             this.reticle.object3D.visible = false;
             return;
         }
