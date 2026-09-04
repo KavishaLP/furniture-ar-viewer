@@ -1,9 +1,10 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
-    <title>Scan Catalogue - AR</title>
+    <meta name="theme-color" content="#f4efe8" />
+    <title>Scan a picture — RoomView</title>
 
     <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -11,23 +12,71 @@
     <script src="./marker-ui.js"></script>
   </head>
 
-  <body>
+  <body class="ar-page">
     <div class="ar-ui-layer marker-ar-ui">
         <div class="ar-top-bar marker-ar-top">
-            <a href="../index.html" class="exit-ar-btn">Back</a>
-            <div id="detected-category" class="detected-label">Scan a marker to begin</div>
+            <a href="../index.html" class="exit-ar-btn">← Home</a>
+            <div id="detected-category" class="detected-label">Point the camera at a picture</div>
+            <button id="help-open-btn" class="help-open-btn" type="button" aria-label="Show the steps">Help</button>
         </div>
 
-        <button id="prev-btn" class="nav-btn nav-btn-side left" aria-label="Previous model">&lt;</button>
-        <button id="next-btn" class="nav-btn nav-btn-side right" aria-label="Next model">&gt;</button>
+        <button id="prev-btn" class="nav-btn nav-btn-side left" aria-label="Previous design">&lt;</button>
+        <button id="next-btn" class="nav-btn nav-btn-side right" aria-label="Next design">&gt;</button>
+
+        <!-- First-time instructions -->
+        <div id="help-sheet" class="help-sheet">
+            <div class="help-card">
+                <h2>Four quick steps</h2>
+                <ol class="help-steps">
+                    <li><strong>Hold the picture in view.</strong> Point your camera at one of the four pictures you saved or printed. The matching furniture appears on it. Need the pictures? <a href="../print-pictures.html">Download them here</a>.</li>
+                    <li><strong>Keep the one you like.</strong> Use the arrows if you want a different design, then tap <strong>Keep this piece</strong>.</li>
+                    <li><strong>Move it around.</strong> Tap a piece, drag to slide it, pinch to resize, or tap Turn left / Turn right.</li>
+                    <li><strong>Add more, then finish.</strong> Scan the next picture to add another piece. When the set looks right, tap <strong>Show my room</strong> to hide the scanner.</li>
+                </ol>
+                <button id="help-close-btn" class="main-btn" type="button">Start looking</button>
+            </div>
+        </div>
 
         <div class="ar-bottom-bar marker-ar-bottom">
-            <div class="marker-model-nav">
-                <button id="prev-btn-mobile" class="nav-btn nav-btn-inline" aria-label="Previous model">&lt;</button>
-                <span id="model-status" class="model-status-text">Waiting for marker…</span>
-                <button id="next-btn-mobile" class="nav-btn nav-btn-inline" aria-label="Next model">&gt;</button>
+            <!-- Controls for the piece you tapped -->
+            <div id="select-panel" class="marker-select-panel" hidden>
+                <span id="selected-label" class="selected-label">This piece</span>
+                <div class="marker-select-row">
+                    <button id="rotate-left-btn" class="select-btn" type="button">⟲ Turn</button>
+                    <button id="rotate-right-btn" class="select-btn" type="button">Turn ⟳</button>
+                </div>
+                <div class="marker-select-row">
+                    <button id="remove-btn" class="select-btn danger" type="button">Remove this</button>
+                    <button id="deselect-btn" class="select-btn" type="button">Looks good</button>
+                </div>
             </div>
-            <p class="ar-hint">Drag to rotate · Pinch to scale</p>
+
+            <!-- Scanning / adding furniture -->
+            <div id="scan-controls" class="marker-controls-block">
+                <div class="marker-model-nav">
+                    <button id="prev-btn-mobile" class="nav-btn nav-btn-inline" aria-label="Previous design">&lt;</button>
+                    <span id="model-status" class="model-status-text">Waiting for a picture…</span>
+                    <button id="next-btn-mobile" class="nav-btn nav-btn-inline" aria-label="Next design">&gt;</button>
+                </div>
+                <p id="placed-count" class="ar-hint">No furniture kept yet</p>
+                <div class="marker-place-row">
+                    <button id="place-btn" class="place-btn" type="button" disabled>Keep this</button>
+                    <button id="undo-btn" class="undo-btn" type="button" disabled>Undo last</button>
+                    <button id="clear-btn" class="undo-btn" type="button" disabled>Clear room</button>
+                </div>
+                <button id="done-btn" class="done-btn" type="button" disabled>Show my room</button>
+            </div>
+
+            <!-- Room view: scanner paused, furniture stays on screen -->
+            <div id="room-controls" class="marker-controls-block" hidden>
+                <p class="room-badge">Scanner is off · furniture stays on screen</p>
+                <div class="marker-place-row">
+                    <button id="add-more-btn" class="place-btn" type="button">Add another piece</button>
+                    <button id="new-floor-btn" class="undo-btn" type="button">Start a new room</button>
+                </div>
+            </div>
+
+            <p id="ar-hint-text" class="ar-hint">Point the camera at a printed picture</p>
         </div>
     </div>
 
@@ -37,8 +86,10 @@
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
+      furniture-manipulator
     >
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-entity id="placed-furniture-group"></a-entity>
 
       <a-entity mindar-image-target="targetIndex: 0" data-category="chair">
         <a-gltf-model
@@ -48,7 +99,6 @@
           position="0 0 0.1"
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
-          gesture-handler
         ></a-gltf-model>
       </a-entity>
 
@@ -60,7 +110,6 @@
           position="0 0 0.1"
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
-          gesture-handler
         ></a-gltf-model>
       </a-entity>
 
@@ -72,7 +121,6 @@
           position="0 0 0.1"
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
-          gesture-handler
         ></a-gltf-model>
       </a-entity>
 
@@ -84,7 +132,6 @@
           position="0 0 0.1"
           scale="0.6 0.6 0.6"
           rotation="0 0 0"
-          gesture-handler
         ></a-gltf-model>
       </a-entity>
     </a-scene>

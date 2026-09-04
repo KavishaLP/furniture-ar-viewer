@@ -1,51 +1,110 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <title>Markerless AR - Room Planner</title>
+    <meta name="theme-color" content="#f4efe8" />
+    <title>Place furniture in your room — RoomView</title>
 
     <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
     <link rel="stylesheet" href="../style/style.css">
     <script src="./interactions.js"></script>
   </head>
 
-  <body>
-    <!-- Selection UI -->
+  <body class="ar-page">
+    <!-- ================= SETUP SCREEN ================= -->
     <div id="selection-ui" class="selection-panel">
         <div class="selection-card">
-            <h2>Room Planner</h2>
-            <p class="selection-subtitle">Choose furniture, then place it in your room</p>
-
-            <div class="category-grid">
-                <button class="category-btn active" data-category="chair">Chair</button>
-                <button class="category-btn" data-category="sofa">Sofa</button>
-                <button class="category-btn" data-category="cupboard">Cupboard</button>
-                <button class="category-btn" data-category="table">Table</button>
+            <div class="setup-head">
+                <a class="setup-back" href="../index.html" aria-label="Back to home">←</a>
+                <div>
+                    <h2>See it on your floor</h2>
+                    <p class="selection-subtitle">Choose a piece, open the camera, then tap the floor where you want it to stand.</p>
+                </div>
             </div>
 
-            <div class="model-picker">
-                <button id="prev-btn" class="nav-btn nav-btn-inline">&lt;</button>
-                <div id="model-preview-text">chair_1.glb</div>
-                <button id="next-btn" class="nav-btn nav-btn-inline">&gt;</button>
+            <div class="setup-step">
+                <p class="setup-step-label"><span class="step-dot">1</span> What would you like to try?</p>
+                <div class="category-grid">
+                    <button class="category-btn active" data-category="chair">Chair</button>
+                    <button class="category-btn" data-category="sofa">Sofa</button>
+                    <button class="category-btn" data-category="cupboard">Cupboard</button>
+                    <button class="category-btn" data-category="table">Table</button>
+                </div>
+            </div>
+
+            <div class="setup-step">
+                <p class="setup-step-label"><span class="step-dot">2</span> Pick a design</p>
+                <div class="model-picker">
+                    <button id="prev-btn" class="nav-btn nav-btn-inline" type="button" aria-label="Previous design">&lt;</button>
+                    <div class="model-picker-text">
+                        <div id="model-preview-text">Classic Wooden Chair</div>
+                        <span id="model-counter" class="model-counter">Design 1 of 3</span>
+                    </div>
+                    <button id="next-btn" class="nav-btn nav-btn-inline" type="button" aria-label="Next design">&gt;</button>
+                </div>
             </div>
 
             <div class="action-stack">
-                <button id="start-ar-btn" class="main-btn">Start Markerless AR</button>
-                <p id="ar-status">Use Chrome on Android over HTTPS to open the camera.</p>
-                <a href="../index.html" class="main-btn secondary">Back to Dashboard</a>
+                <button id="start-ar-btn" class="main-btn">Open my camera</button>
+                <p id="ar-status">Your phone will ask to use the camera — tap Allow. This works in Chrome on an Android phone.</p>
+                <a href="../index.html" class="main-btn secondary">Not now — back home</a>
+            </div>
+
+            <div class="setup-tips">
+                <p class="setup-tips-title">What happens next</p>
+                <ul>
+                    <li>Hold the phone so you can see the floor, and move it slowly left and right.</li>
+                    <li>A circle appears on the floor — that is the spot where the furniture will stand.</li>
+                    <li>Tap <strong>Place it here</strong>. Then turn it with one finger, pinch to resize, or tap <strong>Add another</strong> to put more pieces on the floor.</li>
+                </ul>
             </div>
         </div>
     </div>
 
-    <!-- AR Overlay -->
+    <!-- ================= AR OVERLAY ================= -->
     <div id="ar-ui" class="ar-ui-layer" style="display: none;">
-        <div class="ar-top-bar">
-            <button id="exit-ar-btn" class="exit-ar-btn" type="button">Exit AR</button>
+        <div class="ar-top-bar ar-top-bar-split">
+            <button id="exit-ar-btn" class="exit-ar-btn" type="button">← Home</button>
+            <span class="live-pill"><span class="live-dot" aria-hidden="true"></span><span id="live-pill-text">Finding the floor</span></span>
         </div>
+
+        <div id="ar-guide" class="ar-guide">
+            <p class="ar-guide-title" id="ar-guide-title">Move the phone slowly over the floor</p>
+            <p class="ar-guide-text" id="ar-guide-text">Keep the floor in the picture. When a circle appears, tap <strong>Place it here</strong> and the furniture will stand on that spot.</p>
+        </div>
+
+        <div id="ar-picker" class="ar-picker" hidden>
+            <p class="ar-picker-title">Pick the next piece, then tap the floor circle</p>
+            <div class="ar-picker-cats">
+                <button class="ar-category-btn active" type="button" data-category="chair">Chair</button>
+                <button class="ar-category-btn" type="button" data-category="sofa">Sofa</button>
+                <button class="ar-category-btn" type="button" data-category="cupboard">Cupboard</button>
+                <button class="ar-category-btn" type="button" data-category="table">Table</button>
+            </div>
+            <div class="model-picker ar-picker-design">
+                <button id="ar-prev-btn" class="nav-btn nav-btn-inline" type="button" aria-label="Previous design">&lt;</button>
+                <div class="model-picker-text">
+                    <div id="ar-model-preview-text">Classic Wooden Chair</div>
+                    <span id="ar-model-counter" class="model-counter">Design 1 of 3</span>
+                </div>
+                <button id="ar-next-btn" class="nav-btn nav-btn-inline" type="button" aria-label="Next design">&gt;</button>
+            </div>
+            <button id="ar-picker-cancel" class="undo-btn" type="button">Cancel</button>
+        </div>
+
         <div class="ar-bottom-bar">
-            <button id="place-btn" class="place-btn" type="button">Place Furniture Here</button>
-            <p class="ar-hint" id="gesture-hint" style="display: none;">Drag to rotate · Pinch to scale</p>
+            <p id="ml-placed-count" class="ar-hint" hidden>No furniture on the floor yet</p>
+            <button id="place-btn" class="place-btn" type="button">Place it here</button>
+            <div id="arrange-row" class="marker-place-row" hidden>
+                <button id="add-another-btn" class="place-btn" type="button">Add another</button>
+                <button id="undo-last-btn" class="undo-btn" type="button">Undo last</button>
+            </div>
+            <div id="reset-row" class="marker-place-row" hidden>
+                <button id="clear-all-btn" class="undo-btn" type="button">Clear all</button>
+                <button id="new-floor-btn" class="undo-btn" type="button">New floor</button>
+            </div>
+            <p class="ar-hint" id="gesture-hint" style="display: none;">One finger turns it · two fingers pinch to resize · tap a piece to choose it</p>
         </div>
     </div>
 
@@ -59,6 +118,7 @@
         device-orientation-permission-ui="enabled: false"
         markerless-placement
         ar-floor-shadows
+        gesture-handler="placementMode: true"
     >
         <a-camera position="0 1.6 0"></a-camera>
 
@@ -81,20 +141,14 @@
         <a-plane
             id="shadow-floor"
             rotation="-90 0 0"
-            width="4"
-            height="4"
+            width="8"
+            height="8"
             visible="false"
             material="shader: shadow; transparent: true; opacity: 0.55"
             shadow="receive: true; cast: false"
         ></a-plane>
 
-        <a-gltf-model
-            id="placed-model"
-            position="0 0 0"
-            scale="0 0 0"
-            shadow="cast: true; receive: false"
-            gesture-handler="placementMode: true"
-        ></a-gltf-model>
+        <a-entity id="placed-furniture-group"></a-entity>
     </a-scene>
   </body>
 </html>

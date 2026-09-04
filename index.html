@@ -3,43 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Furniture Viewer | INTE 42312</title>
+    <meta name="description" content="See how a chair, sofa, cupboard or table looks in your own room using your phone camera. Nothing to install.">
+    <meta name="theme-color" content="#f4efe8">
+    <title>RoomView — See furniture in your own room</title>
     <link rel="stylesheet" href="./style/style.css">
 </head>
-<body class="dashboard-body">
-    <div class="dashboard-container">
-        <span class="dashboard-badge">INTE 42312 · Virtual &amp; Augmented Reality</span>
-        <h1>AR Furniture Catalogue</h1>
-        <p class="subtitle">
-            Visualize chairs, sofas, cupboards and tables in augmented reality —
-            using marker-based scanning or markerless room placement.
-        </p>
+<body class="page">
 
-        <div class="dashboard-cards">
-            <a href="./marker_AR/marker.html" class="mode-card">
-                <div class="mode-card-icon marker">📷</div>
-                <div class="mode-card-content">
-                    <h3>Marker AR — Scan Catalogue</h3>
-                    <p>Scan a printed target image to view furniture models in AR</p>
-                </div>
-            </a>
-            <a href="./markerless_AR/markerless.html" class="mode-card">
-                <div class="mode-card-icon markerless">🏠</div>
-                <div class="mode-card-content">
-                    <h3>Markerless AR — Room Planner</h3>
-                    <p>Place furniture anywhere in your room without a marker</p>
-                </div>
-            </a>
-            <a href="./references.html" class="mode-card">
-                <div class="mode-card-icon marker">📄</div>
-                <div class="mode-card-content">
-                    <h3>Model References</h3>
-                    <p>Author credits and Sketchfab links for all 3D models</p>
-                </div>
-            </a>
-        </div>
+    <header class="app-header">
+        <a class="brand" href="./index.html">
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3" />
+                    <path d="M3 11h18v9H3z" />
+                    <path d="M8 20v2M16 20v2" />
+                </svg>
+            </span>
+            <span class="brand-name">RoomView</span>
+        </a>
+        <nav class="header-nav" aria-label="Main">
+            <a class="header-link" href="#how">How it works</a>
+            <a class="header-link" href="./references.html">Credits</a>
+            <a class="header-cta" href="#start">Try it now</a>
+        </nav>
+    </header>
 
-        <p class="dashboard-footer">Assignment 01 · Furniture AR Viewer · <a href="./references.html">References</a></p>
-    </div>
+    <main>
+        <section class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Furniture, in your room, on your phone</p>
+                <h1>Try a chair in the corner before you buy it</h1>
+                <p class="lede">
+                    Open your camera, tap the floor, and the furniture appears at life size.
+                    Walk around it. Slide it next to the sofa. See if it actually fits —
+                    no tape measure, no app to install.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="./markerless_AR/markerless.html">See it in my room</a>
+                    <a class="btn btn-ghost" href="./print-pictures.html">Scan a printed picture</a>
+                </div>
+                <p class="hero-note">
+                    Works in your phone browser. The camera picture stays on your phone — we never record or upload it.
+                </p>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                <div class="hero-stage">
+                    <svg class="hero-room" viewBox="0 0 420 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="24" y="28" width="372" height="284" rx="28" fill="#efe6d8"/>
+                        <rect x="48" y="52" width="324" height="168" rx="8" fill="#e4d5c1"/>
+                        <rect x="48" y="220" width="324" height="68" fill="#d7c4ab"/>
+                        <rect x="70" y="168" width="168" height="72" rx="10" fill="#6b3f2a"/>
+                        <rect x="82" y="148" width="144" height="28" rx="8" fill="#8a5640"/>
+                        <rect x="262" y="186" width="78" height="54" rx="6" fill="#c45c3e"/>
+                        <rect x="274" y="166" width="54" height="28" rx="4" fill="#d97a5c"/>
+                        <circle cx="330" cy="96" r="22" fill="#c4a574" opacity="0.7"/>
+                        <rect x="326" y="118" width="8" height="48" fill="#8a7354"/>
+                    </svg>
+                    <span class="hero-badge">Live in your room</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="start" aria-labelledby="start-title">
+            <h2 class="section-title" id="start-title">Choose how you’d like to start</h2>
+            <p class="section-sub">Same furniture either way. Pick the one that matches what you have in front of you.</p>
+
+            <div class="option-grid">
+                <a class="option-card is-recommended" href="./markerless_AR/markerless.html">
+                    <div class="option-head">
+                        <span class="option-icon" aria-hidden="true">🏠</span>
+                        <span class="option-tag">Easiest</span>
+                    </div>
+                    <h3>Place it on my floor</h3>
+                    <p class="option-text">
+                        Your phone looks for the floor. When a circle appears on the ground,
+                        tap once and the furniture stands there at real size.
+                    </p>
+                    <ul class="option-facts">
+                        <li><span aria-hidden="true">✓</span> Nothing to print</li>
+                        <li><span aria-hidden="true">✓</span> See if it fits the space</li>
+                        <li><span aria-hidden="true">i</span> Android phone + Chrome</li>
+                    </ul>
+                    <span class="option-cta">Open the camera</span>
+                </a>
+
+                <a class="option-card" href="./print-pictures.html">
+                    <div class="option-head">
+                        <span class="option-icon" aria-hidden="true">📄</span>
+                    </div>
+                    <h3>Scan a printed picture</h3>
+                    <p class="option-text">
+                        First save or print the four catalogue pictures. Then point your camera
+                        at one of them. The matching furniture pops up on the paper.
+                    </p>
+                    <ul class="option-facts">
+                        <li><span aria-hidden="true">✓</span> iPhone and Android</li>
+                        <li><span aria-hidden="true">✓</span> Build a full room of pieces</li>
+                        <li><span aria-hidden="true">i</span> Download the pictures first, then scan</li>
+                    </ul>
+                    <span class="option-cta">Get the pictures</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="catalogue-title">
+            <h2 class="section-title" id="catalogue-title">What’s in the collection</h2>
+            <p class="section-sub">Seven real 3D pieces. Tap a way to start, then browse the designs on your phone.</p>
+
+            <div class="catalogue-grid">
+                <article class="product-card">
+                    <div class="product-art product-art-chair" aria-hidden="true">🪑</div>
+                    <h3>Chairs</h3>
+                    <p>Classic wood, rustic, and an armchair — three looks to try by the table or in a reading corner.</p>
+                    <span class="product-meta">3 designs</span>
+                </article>
+                <article class="product-card">
+                    <div class="product-art product-art-sofa" aria-hidden="true">🛋️</div>
+                    <h3>Sofas</h3>
+                    <p>A fabric three-seater and a dark lounge sofa. See how they sit against your wall.</p>
+                    <span class="product-meta">2 designs</span>
+                </article>
+                <article class="product-card">
+                    <div class="product-art product-art-cupboard" aria-hidden="true">🗄️</div>
+                    <h3>Cupboard</h3>
+                    <p>An open bookcase. Check the height against your shelves and the width of the alcove.</p>
+                    <span class="product-meta">1 design</span>
+                </article>
+                <article class="product-card">
+                    <div class="product-art product-art-table" aria-hidden="true">🪵</div>
+                    <h3>Table</h3>
+                    <p>A wooden dining table. Place it, walk around, and see if chairs still have room to pull out.</p>
+                    <span class="product-meta">1 design</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="how" aria-labelledby="how-title">
+            <h2 class="section-title" id="how-title">How it works</h2>
+            <p class="section-sub">About a minute, from opening the page to furniture on the floor.</p>
+
+            <ol class="steps">
+                <li class="step">
+                    <span class="step-no">1</span>
+                    <div>
+                        <h3>Allow the camera</h3>
+                        <p>Your phone asks once. Tap <strong>Allow</strong>. The live picture is only shown on your screen — nothing is saved or sent anywhere.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <span class="step-no">2</span>
+                    <div>
+                        <h3>Pick a piece</h3>
+                        <p>Choose a chair, sofa, cupboard or table, then swipe through the designs until one feels right.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <span class="step-no">3</span>
+                    <div>
+                        <h3>Place it, then nudge it</h3>
+                        <p>Tap to put it down. Drag with one finger to move or turn it. Pinch with two fingers to make it bigger or smaller. Don’t like it? Remove it and try another.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+       
+    </main>
+
+    <footer class="app-footer">
+        <p class="footer-brand">RoomView</p>
+        <p>See it in the room. Then decide.</p>
+        <p><a href="./references.html">Who made these 3D models</a></p>
+    </footer>
+
 </body>
 </html>

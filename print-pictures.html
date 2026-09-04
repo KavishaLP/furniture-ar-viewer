@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4efe8">
+    <title>Download the pictures — RoomView</title>
+    <link rel="stylesheet" href="./style/style.css">
+</head>
+<body class="page">
+
+    <header class="app-header">
+        <a class="brand" href="./index.html">
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3" />
+                    <path d="M3 11h18v9H3z" />
+                    <path d="M8 20v2M16 20v2" />
+                </svg>
+            </span>
+            <span class="brand-name">RoomView</span>
+        </a>
+        <nav class="header-nav" aria-label="Main">
+            <a class="header-link" href="./index.html">Home</a>
+            <a class="header-cta" href="./marker_AR/marker.html">I already have them</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero hero-compact">
+            <p class="eyebrow">Step 1 of 2 · Scan a picture</p>
+            <h1>Get the pictures first</h1>
+            <p class="lede">
+                The camera looks for these four pictures. Download them to your phone, then
+                open them on another screen — or keep them handy — and open the camera.
+            </p>
+        </section>
+
+        <section class="section" aria-labelledby="how-print-title">
+            <h2 class="section-title" id="how-print-title">The easy way</h2>
+            <ol class="steps">
+                <li class="step">
+                    <span class="step-no">1</span>
+                    <div>
+                        <h3>Download the pictures</h3>
+                        <p>Tap <strong>Download</strong> under the one you want, or tap <strong>Download all</strong> to save all four at once.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <span class="step-no">2</span>
+                    <div>
+                        <h3>Show one picture to the camera</h3>
+                        <p>Open a downloaded picture on another phone or computer, or hold it on screen. Keep it flat, fully visible, and in good light.</p>
+                    </div>
+                </li>
+                <li class="step">
+                    <span class="step-no">3</span>
+                    <div>
+                        <h3>Open the camera</h3>
+                        <p>When the pictures are ready, tap <strong>Pictures are ready — open camera</strong>. Point at one picture and the matching furniture appears.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="section" aria-labelledby="pictures-title">
+            <div class="print-toolbar">
+                <h2 class="section-title" id="pictures-title">The four pictures</h2>
+                <div class="print-toolbar-actions">
+                    <button class="btn btn-ghost" type="button" id="download-all-btn">Download all</button>
+                </div>
+            </div>
+            <p class="section-sub">Each picture opens a different piece of furniture. Download the one you want to try — or download all four to build a full set.</p>
+
+            <div class="marker-print-grid">
+                <article class="marker-print-card">
+                    <div class="marker-print-preview">
+                        <img src="./assets/markers/chair-marker.jpg" alt="Chair picture to print or save">
+                    </div>
+                    <h3>Chair</h3>
+                    <p>Point the camera at this picture to see the chairs.</p>
+                    <a class="btn btn-ghost marker-download" href="./assets/markers/chair-marker.jpg" download="roomview-chair-picture.jpg">Download chair picture</a>
+                </article>
+
+                <article class="marker-print-card">
+                    <div class="marker-print-preview">
+                        <img src="./assets/markers/sofa-marker.jpg" alt="Sofa picture to print or save">
+                    </div>
+                    <h3>Sofa</h3>
+                    <p>Point the camera at this picture to see the sofas.</p>
+                    <a class="btn btn-ghost marker-download" href="./assets/markers/sofa-marker.jpg" download="roomview-sofa-picture.jpg">Download sofa picture</a>
+                </article>
+
+                <article class="marker-print-card">
+                    <div class="marker-print-preview">
+                        <img src="./assets/markers/cupboard-marker.jpg" alt="Cupboard picture to print or save">
+                    </div>
+                    <h3>Cupboard</h3>
+                    <p>Point the camera at this picture to see the cupboard.</p>
+                    <a class="btn btn-ghost marker-download" href="./assets/markers/cupboard-marker.jpg" download="roomview-cupboard-picture.jpg">Download cupboard picture</a>
+                </article>
+
+                <article class="marker-print-card">
+                    <div class="marker-print-preview">
+                        <img src="./assets/markers/table-marker.jpg" alt="Table picture to print or save">
+                    </div>
+                    <h3>Table</h3>
+                    <p>Point the camera at this picture to see the table.</p>
+                    <a class="btn btn-ghost marker-download" href="./assets/markers/table-marker.jpg" download="roomview-table-picture.jpg">Download table picture</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-row">
+                <a class="btn btn-primary" href="./marker_AR/marker.html">Pictures are ready — open camera</a>
+                <a class="btn btn-ghost" href="./index.html">Back to home</a>
+            </div>
+            <p class="hero-note">Already downloaded them? Skip this and open the camera.</p>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p class="footer-brand">RoomView</p>
+        <p>See it in the room. Then decide.</p>
+    </footer>
+
+    <script>
+        document.getElementById('download-all-btn').addEventListener('click', () => {
+            const links = document.querySelectorAll('.marker-download');
+            links.forEach((link, index) => {
+                window.setTimeout(() => link.click(), index * 350);
+            });
+        });
+    </script>
+</body>
+</html>
